@@ -19,6 +19,7 @@
 @CHARSET "UTF-8";
 
 /** General ***/
+@import url(https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css);
 
 .floatleft {
   float: left;
@@ -628,4 +629,81 @@ label {
     float: left;
     width: 78%;	
 	
+}
+
+.iqv-item {
+  width: auto;
+  border: 2px solid #ccc;
+  padding: 5px;
+}
+
+.iqv-item:focus, .iqv-item:hover {
+  width: auto;
+  border: 2px solid #018fe2;
+  padding: 5px;
+  
+}
+
+.quote-style {
+  quotes: "“";
+  color: #018fe2;
+  font-size: 50px;
+  height: 0px;
+  margin-bottom: 5px;
+  
+}
+
+.quote-style::before {
+  content: open-quote;
+}
+
+.use-ajax {
+  margin-left: -13%;
+}
+
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 140px;
+  background-color: #018fe2;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 150%;
+  left: 50%;
+  margin-left: -75px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #018fe2 transparent transparent transparent;
+  
+  
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+.text-permalink {
+  border: 1px solid #ccc;
+  width: 70%;
+  color: #018fe2;
 }

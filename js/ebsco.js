@@ -187,10 +187,15 @@ try
 
 
 	});
-	//})(jQuery);
+
 	
 }
-catch( e)
+catch(e)
 {
-	alert (e);
+	alert(e);
 }
+
+
+
+
+

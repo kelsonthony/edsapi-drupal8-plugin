@@ -183,6 +183,12 @@ class EBSCOConnector {
 
   private $logAPIRequests;
 
+    /**
+   * Autocomplete
+   * @global string
+   */
+  private $autoComplete;
+
 
   /**
    * The logger object.
@@ -205,6 +211,7 @@ class EBSCOConnector {
     $this->userId = $config['user'];
     $this->interfaceId = $config['interface'];
     $this->profileId = $config['profile'];
+    $this->autoComplete = $config['autocomplete'];
     $this->orgId = $config['organization'];
     $this->local_ip_address = $config['local_ip_address'];
     $this->isGuest = (\Drupal::currentUser()->isAuthenticated() || $this->isGuestIPAddress($_SERVER["REMOTE_ADDR"])) ? 'n' : 'y';
@@ -213,6 +220,9 @@ class EBSCOConnector {
       // $writer = new Zend_Log_Writer_Stream('php://output');
       
     // }
+
+    // var_dump($config);
+    // die();
   }
 
   /**
@@ -267,10 +277,17 @@ class EBSCOConnector {
     $params = '<UIDAuthRequestMessage xmlns="http://www.ebscohost.com/services/public/AuthService/Response/2012/06/01">'
 					.'<UserId>'.$this->userId.'</UserId>'
 					.'<Password>'.$this->password.'</Password>'
-					.'<InterfaceId>wsapi</InterfaceId>'
+          .'<InterfaceId>wsapi</InterfaceId>'
+          .'<Options>
+              <Option>'.$this->autoComplete.'</Option>
+            </Options>'
 					.'</UIDAuthRequestMessage>';
 
     $response = $this->request($url,$params, array(), 'POST');
+
+    // var_dump($response);
+    // die();
+
     return $response;
   }
 
@@ -292,9 +309,13 @@ class EBSCOConnector {
       'profile' => $this->profileId,
       'org'     => $this->orgId,
       'guest'   => $this->isGuest,
+      //'autocomplete' => $this->autoComplete
     );
 
     $response = $this->request($url, $params, $headers);
+
+    // var_dump($response);
+    // die();
     return $response;
   }
 
@@ -333,8 +354,73 @@ class EBSCOConnector {
     $url = self::$end_point . '/Retrieve';
 
     $response = $this->request($url, $params, $headers);
+
+    // var_dump($response);
+    // die();
+    
     return $response;
   }
+
+  /**
+   * Export a specific record.
+   *
+   * @param array $params
+   *   Export specific parameters.
+   * @param array $headers
+   *   Authentication and session tokens.
+   *
+   * @return object SimpleXml or PEAR_Error
+   *
+   * @access public
+   */
+  public function requestExport($params, $headers) {
+    $url = self::$end_point . '/ExportFormat';
+
+    $response = $this->request($url, $params, $headers);
+
+    return $response;
+  }
+
+  /**
+   * CitationStyles a specific record.
+   *
+   * @param array $params
+   *   CitationStyles specific parameters.
+   * @param array $headers
+   *   Authentication and session tokens.
+   *
+   * @return object SimpleXml or PEAR_Error
+   *
+   * @access public
+   */
+  public function requestCitationStyles($params, $headers) {
+    $url = self::$end_point . '/CitationStyles';
+
+    
+    $responseCitation = $this->request($url, $params, $headers);
+    $response = $responseCitation->Citations;
+
+    return $response;
+    
+  }
+
+
+
+  // public function requestAutoComplete($params, $headers) {
+  //   $url = self::$end_point . '/autoComplete';
+  //   $params = array(
+  //     'autocomplete' => $this->autoComplete
+  //   );
+
+  //   $response = $this->request($url, $params, $headers);
+
+  //   // var_dump($url);
+  //   // die();
+
+  //   return $response;
+  // }
+
+  
 
   /**
    * Request the info data.
@@ -390,11 +476,11 @@ class EBSCOConnector {
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($curl, CURLOPT_MAXREDIRS, 10 );		
-		curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
-		curl_setopt($curl, CURLOPT_TIMEOUT, 10);
-		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
-		curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+		    curl_setopt($curl, CURLOPT_MAXREDIRS, 10 );		
+		    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+		    curl_setopt($curl, CURLOPT_TIMEOUT, 10);
+		    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+		    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
 					
         switch ($method)
         {

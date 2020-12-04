@@ -26,21 +26,23 @@ class EbscoAdmin extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $config = $this->config('ebsco.settings');
 
-	$values = $form_state->getValues();
-	$config->set("ebsco_guest", $values["ebsco_guest"]);
-	$config->set("ebsco_default_limit", $values["ebsco_default_limit"]);
-	$config->set("ebsco_default_sort", $values["ebsco_default_sort"]);
-	$config->set("ebsco_default_amount", $values["ebsco_default_amount"]);
-	$config->set("ebsco_default_mode", $values["ebsco_default_mode"]);
-	$config->set("ebsco_user", $values["ebsco_user"]);
-	$config->set("ebsco_password", $values["ebsco_password"]);
-	$config->set("ebsco_interface", $values["ebsco_interface"]);
-	$config->set("ebsco_organization", $values["ebsco_organization"]);
-	$config->set("ebsco_profile", $values["ebsco_profile"]);
-	$config->set("ebsco_local_ips", $values["ebsco_local_ips"]);
-	$config->set("ebsco_show_pdf_links", $values["ebsco_show_pdf_links"]);
-	$config->set("ebsco_show_html_links", $values["ebsco_show_html_links"]);
-	$config->save(); 
+    $values = $form_state->getValues();
+    $config->set("ebsco_guest", $values["ebsco_guest"]);
+    $config->set("ebsco_default_limit", $values["ebsco_default_limit"]);
+    $config->set("ebsco_default_sort", $values["ebsco_default_sort"]);
+    $config->set("ebsco_default_amount", $values["ebsco_default_amount"]);
+    $config->set("ebsco_default_mode", $values["ebsco_default_mode"]);
+    $config->set("ebsco_user", $values["ebsco_user"]);
+    $config->set("ebsco_password", $values["ebsco_password"]);
+    $config->set("ebsco_interface", $values["ebsco_interface"]);
+    $config->set("ebsco_autocomplete", $values["ebsco_autocomplete"]);
+    $config->set("ebsco_organization", $values["ebsco_organization"]);
+    $config->set("ebsco_profile", $values["ebsco_profile"]);
+    $config->set("ebsco_local_ips", $values["ebsco_local_ips"]);
+    $config->save(); 
+
+    // var_dump($config);
+    // die();
 	
   }
 
@@ -97,6 +99,15 @@ class EbscoAdmin extends ConfigFormBase {
       '#required' => FALSE,
     ];
 
+    $form['ebsco_credentials']['ebsco_autocomplete'] = [
+      '#type' => 'textfield',
+      '#title' => t('Autocomplete'),
+      '#default_value' => $config->get('ebsco_autocomplete'),
+      '#size' => 50,
+      '#description' => t("The API has Autocomplete."),
+      '#required' => TRUE,
+    ];
+
     $form['ebsco_credentials']['ebsco_organization'] = [
       '#type' => 'textfield',
       '#title' => t('Organization Id'),
@@ -126,20 +137,6 @@ class EbscoAdmin extends ConfigFormBase {
       ],
       '#required' => TRUE,
     ];
-
-    $form['ebsco_credentials']['ebsco_guest'] = [
-      '#type' => 'radios',
-      '#title' => t('Guest ?'),
-      '#default_value' => $config->get('ebsco_guest'),
-      '#description' => t("The Guest session."),
-      '#options' => [
-        t('No'),
-        t('Yes'),
-      ],
-      '#required' => TRUE,
-    ];
-
-
 
     $form['ebsco_general'] = [
       '#type' => 'fieldset',
@@ -181,31 +178,7 @@ class EbscoAdmin extends ConfigFormBase {
       '#options' => \EBSCODocument::mode_options(),
       '#required' => TRUE,
     ];
-	
-    $form['ebsco_general']['ebsco_show_pdf_links'] = [
-      '#type' => 'radios',
-      '#title' => t('Show PDF Links ?'),
-      '#default_value' => $config->get('ebsco_show_pdf_links'),
-      '#description' => t("If the PDF link from EBSCO databases should be displayed  in the result list or record level"),
-      '#options' => [
-        t('No'),
-        t('Yes'),
-      ],
-      '#required' => TRUE,
-    ];
-	
-    $form['ebsco_general']['ebsco_show_html_links'] = [
-      '#type' => 'radios',
-      '#title' => t('Show HTML Links ?'),
-      '#default_value' => $config->get('ebsco_show_html_links'),
-      '#description' => t("If the HTML link from EBSCO databases should be displayed in the result list or record level"),
-      '#options' => [
-        t('No'),
-        t('Yes'),
-      ],
-      '#required' => TRUE,
-    ];
-	
+
     return parent::buildForm($form, $form_state);
   }
 

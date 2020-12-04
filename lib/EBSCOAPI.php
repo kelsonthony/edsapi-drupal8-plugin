@@ -24,6 +24,7 @@
 
 require_once 'EBSCOConnector.php';
 require_once 'EBSCOResponse.php';
+//require_once 'EBSCOAutocomplete.php';
 
 /**
  * EBSCO API class.
@@ -117,6 +118,10 @@ class EBSCOAPI {
    */
   public function __construct($config) {
     $this->config = $config;
+
+    
+    // var_dump($config);
+    // die();
   }
 
   /**
@@ -128,15 +133,81 @@ class EBSCOAPI {
    *
    * @access public
    */
-  public function authenticationToken($token = NULL) {
-    if (empty($token)) {
-      $token = $this->readSession('authenticationToken');
-      return !empty($token) ? $token : $this->authenticationToken;
-    }
-    else {
-      $this->authenticationToken = $token;
-      $this->writeSession('authenticationToken', $token);
-    }
+  // public function authenticationToken($token = NULL) {
+  //   if (empty($token)) {
+  //     $token = $this->readSession('authenticationToken');
+
+  //     // var_dump($token);
+  //     // die();
+  //     return !empty($token) ? $token : $this->authenticationToken;
+  //   }
+  //   else {
+  //     $this->authenticationToken = $token;
+  //     $this->writeSession('authenticationToken', $token);
+  //   }
+  // }
+
+  public function authenticationToken(){
+
+    // $buildTest = [];
+
+    // $buildTest['content'] = [
+		// 	'#markup' => '<div id="buildtest">' . $this->t('My Build Test from EBSCO AOI') . '</div>',
+		// ];
+
+    // $buildTest['#attached']['library'][] = 'ebsco/autocomplete';
+
+    // var_dump($buildTest);
+    // die();
+
+    $autocompleteTokenTimeOut=time();
+		$authenticationTimeout=0;
+		if (isset($_SESSION["authenticationToken"])){
+           // $this->token = $_SESSION["authenticationToken"];
+            $token = $_SESSION["authenticationToken"];
+            $authenticationTimeout = $_SESSION["authenticationTimeout"]-600;
+            $timeout = $_SESSION["authenticationTimeout"];
+            $autocompleteUrl = $_SESSION["autocompleteUrl"];
+            $autoToken = $_SESSION["autocompleteToken"];
+            $autocompleteTokenTimeOut = $_SESSION["autocompleteTokenTimeOut"];
+            $autocompleteCustId = $_SESSION["autocompleteCustId"];
+		}else{
+			$result = $this->apiAuthenticationToken();
+      $_SESSION["authenticationToken"]= $result['authenticationToken'];
+      $_SESSION["authenticationTimeout"]= $result['authenticationTimeout'];
+      $_SESSION['autocompleteUrl'] = $result['autocompleteUrl'];
+      $_SESSION['autocompleteToken'] = $result['autocompleteToken'];
+      $_SESSION["autocompleteTokenTimeOut"]= $result['autocompleteTokenTimeOut'];  
+      $_SESSION['autocompleteCustId'] = $result['autocompleteCustId'];
+		}
+
+    if(time()-$autocompleteTokenTimeOut >= $authenticationTimeout){
+      $result = $this->apiAuthenticationToken();
+      $_SESSION["authenticationToken"]= $result['authenticationToken'];
+      $_SESSION["authenticationTimeout"]= $result['authenticationTimeout'];
+      $_SESSION['autocompleteUrl'] = $result['autocompleteUrl'];
+      $_SESSION['autocompleteToken'] = $result['autocompleteToken'];
+      $_SESSION["autocompleteTokenTimeOut"]= $result['autocompleteTokenTimeOut'];  
+      $_SESSION['autocompleteCustId'] = $result['autocompleteCustId'];
+
+
+    
+
+    $result = array(
+      'authenticationToken'   => $token,
+      'authenticationTimeout' => $timeout,
+      'autocompleteUrl' => $autocompleteUrl,
+      'autocompleteToken' => $autoToken,
+      'autocompleteTokenTimeOut' => $autocompleteTokenTimeOut,
+      'autocompleteCustId' => $autocompleteCustId
+    );
+
+      // var_dump($result);
+      // die();
+      return $result['authenticationToken'];
+		}else{
+            return $this->token;
+        }
   }
 
   /**
@@ -299,22 +370,41 @@ class EBSCOAPI {
    *
    * @access public
    */
-  public function apiAuthenticationToken() {
-    $response = $this->connector()->requestAuthenticationToken();
+  //starts here
+  // public function apiAuthenticationToken() {
+  //   $response = $this->connector()->requestAuthenticationToken();
 
-    if ($this->isError($response)) {
-      return $response;
-    }
-    else {
+  //   // var_dump($response);
+  //   // die();
+
+  //   if ($this->isError($response)) {
+  //     return $response;
+  //   }
+  //   else {
+  //     $result = $this->response($response)->result();
+       
+  //     if (isset($result['authenticationToken'])) {
+        
+  //       $this->authenticationToken($result['authenticationToken']);
+
+  //       var_dump($result);
+  //       die();
+  //       return $result['authenticationToken'];
+  //     }
+  //     else {
+  //       return new EBSCOException("No authentication token was found in the response.");
+  //     }
+  //   }
+  // }
+
+  public function apiAuthenticationToken()
+  {
+      $response = $this->connector()->requestAuthenticationToken();
       $result = $this->response($response)->result();
-      if (isset($result['authenticationToken'])) {
-        $this->authenticationToken($result['authenticationToken']);
-        return $result['authenticationToken'];
-      }
-      else {
-        return new EBSCOException("No authentication token was found in the response.");
-      }
-    }
+
+      // var_dump($result);
+      // die();
+      return $result;
   }
 
   /**
@@ -397,14 +487,19 @@ class EBSCOAPI {
    */
   public function apiSearch($search,
   $filters,
-        $start = 1,
+  $start = 1,
   $limit = 10,
   $sortBy = 'relevance',
   $amount = 'detailed',
   $mode = 'all',
   $rs = FALSE,
   $emp = FALSE,
-  $autosuggest = FALSE) {
+  $autosuggest = FALSE,
+  $includeimagequickview = FALSE,
+  $styles = '',
+  $IllustrationInfo = FALSE,
+  $autoComplete = FALSE
+  ) {
     $query = array();
 
     // Basic search.
@@ -493,20 +588,12 @@ class EBSCOAPI {
       }
     }
     if (!empty($limiters)) {
-	  $query['limiter']='';
-      foreach ($limiters as $field => $limiter) {
-        // e.g. LA99:English,French,German.
-		if ($query['limiter']=="")
-		{
-			$query['limiter'].= $field . ':' . implode(',', $limiter);
-		}
-		else
-		{
-			// add next limiters s addlimiter()
-			$limiters[$field][] = $limiter;
-		}
+      $query['limiter']='';
+        foreach ($limiters as $field => $limiter) {
+          // e.g. LA99:English,French,German.
+          $query['limiter'].= $field . ':' . implode(',', $limiter);
+        }
       }
-    }
     if (!empty($expanders)) {
       // e.g. fulltext, thesaurus.
       $query['expander'] = implode(',', $expanders);
@@ -553,6 +640,16 @@ class EBSCOAPI {
     // 'pagenumber'     => 1,
         // Specifies whether or not to include highlighting in the search results.
       'highlight'      => 'y',
+
+      
+      'includeimagequickview' => $includeimagequickview,
+
+
+      'format' => 'ris',
+
+      'styles'    => $styles,
+
+    
     );
 
     if ($autosuggest == TRUE) {
@@ -572,9 +669,26 @@ class EBSCOAPI {
       }
     }
 
+    if ($includeimagequickview == TRUE) {
+      $params["includeimagequickview"] = "y";
+    }
+
+    if ($styles == 'all') {
+      $params["styles"] = "all";
+    }
+
+    if ($autoComplete == TRUE) {
+      $params["autocomplete"] = "y";
+    }
+
     $params = array_merge($params, $query);
 
+
     $result = $this->request('Search', $params);
+
+    // var_dump($result);
+    // die();
+
     return $result;
   }
 
@@ -594,16 +708,55 @@ class EBSCOAPI {
    */
   public function apiRetrieve($an, $db) {
     // Add the HTTP query params.
+    //$includeimagequickviewDetail = FALSE;
     $params = array(
       'an'        => $an,
       'dbid'      => $db,
       'highlight' => 'y',
+      //'includeimagequickview' => $includeimagequickviewDetail,
+      //'IllustrationInfo' => 'y',
+      'IllustrationInfo' => $IllustrationInfo,
+      'format' => 'ris',
+      'styles'    => $styles,
     );
-
-    $result = $this->request('Retrieve', $params);
+    
+    $result = $this->request('Retrieve', $params);    
+        
     return $result;
+    
   }
 
+  
+
+  public function apiExport($an, $db) {
+
+    $params = array(
+      'an'        => $an,
+      'dbid'      => $db,
+      'format' => 'ris'
+    );
+    
+    $result = $this->request('Export', $params);
+    
+    return $result;
+    
+  }
+
+  public function apiCitationStyles($an, $db, $styles) {
+
+    $params = array(
+      'an'        => $an,
+      'dbid'      => $db,
+      'styles'    => $styles
+    );
+    
+    $result = $this->request('CitationStyles', $params);
+    
+    return $result;
+    
+  }
+
+  
   /**
    * Wrapper for info API call.
    *
@@ -622,9 +775,63 @@ class EBSCOAPI {
     if (!$this->isError($result)) {
       $this->writeSession('info', $result);
     }
-
+    // var_dump($result);
+    // die();
     return $result;
   }
+
+  /**
+   * autocomplete
+   */
+  public function apiAutoComplete(){
+    if(self::$autocomplete == 'y'){
+      var_dump($autocomplete);
+      die();
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
+  // public function apiAutoComplete( $term = "te", $idx = "rawqueries", 
+  //   $filtersAuto = '
+  //     [{"name":"custid",
+  //       "values":"kelanthony"
+  //     }]', 
+  //     $token = "hello" ) {
+
+  //   $params = array(
+  //     'term' => $term,
+  //     'idx' => $idx,
+  //     'filters' => $filtersAuto,
+  //     'token' => $token
+  //   );
+
+  //   $result = $this->request('autoComplete', $params);
+
+  //   // var_dump($params);
+  //   // die();
+
+  //   return $result;
+
+  // }
+  // public function apiAutoComplete($term, $idx, $filtersAuto, $token) {
+
+  //   $params = array(
+  //     'term' => $term,
+  //     'idx' => $idx,
+  //     'filters' => $filtersAuto,
+  //     'token' => $token
+  //   );
+
+  //   $result = $this->request('autoComplete', $params);
+
+  //   var_dump($result);
+  //   die();
+
+  //   return $result;
+
+  // }
 
   /**
    * Handle a PEAR_Error. Return :

@@ -28,6 +28,7 @@
 
 require_once __DIR__ . '/EBSCOAPI.php';
 require_once __DIR__ . '/EBSCORecord.php';
+require_once __DIR__ . '/EBSCOAutocomplete.php';
 
 /**
  *
@@ -86,6 +87,10 @@ class EBSCODocument {
     private $relatedContent = array();
 
     private $autoSuggestTerms = array();
+
+    private $imageQuickViewTerms = array();
+
+  
 
     /**
      * The array of filters currently applied.
@@ -211,6 +216,7 @@ class EBSCODocument {
             'user'         => \Drupal::config('ebsco.settings')->get('ebsco_user'),
             'profile'      => \Drupal::config('ebsco.settings')->get('ebsco_profile'),
             'interface'    => \Drupal::config('ebsco.settings')->get('ebsco_interface'),
+            'autocomplete'    => \Drupal::config('ebsco.settings')->get('ebsco_autocomplete'),
             'organization' => \Drupal::config('ebsco.settings')->get('ebsco_organization'),
             'local_ip_address' => \Drupal::config('ebsco.settings')->get('ebsco_local_ips'),
             'guest'        => \Drupal::config('ebsco.settings')->get('ebsco_guest'),
@@ -218,12 +224,13 @@ class EBSCODocument {
         ));
 
         $this->params = $params ? $params : $_REQUEST;
+        
 
         $this->limit = \Drupal::config('ebsco.settings')->get('ebsco_default_limit') ? \Drupal::config('ebsco.settings')->get('ebsco_default_limit') : $this->limit;
 
         $this->amount = \Drupal::config('ebsco.settings')->get('ebsco_default_amount') ? \Drupal::config('ebsco.settings')->get('ebsco_default_amount') : $this->amount;
     }
-
+    
     /**
      * Perform the API Info call.
      *
@@ -231,7 +238,10 @@ class EBSCODocument {
      */
     public function info() {
         $this->info = $this->eds->apiInfo();
+        
         return $this->info;
+
+        
     }
 
     /**
@@ -242,6 +252,72 @@ class EBSCODocument {
     public function retrieve() {
         list($an, $db) = isset($this->params['id']) ? explode('|', $this->params['id'], 2) : array(NULL, NULL);
         $this->result = $this->eds->apiRetrieve($an, $db);
+
+        return $this->result;
+        
+    }
+
+     /**
+     * Perform the API Export call.
+     *
+     * @return array
+     */
+    public function export() {
+        list($an, $db) = isset($this->params['id']) ? explode('|', $this->params['id'], 2) : array(NULL, NULL);
+        
+        $this->result = $this->eds->apiExport($an, $db, 'format=ris');
+
+        return $this->result;
+        
+    }
+
+    /**
+     * Perform the API CitationStyles call.
+     *
+     * @return array
+     */
+    public function citation() {
+        list($an, $db, $styles) = isset($this->params['id']) ? explode('|', $this->params['id'], 3) : array(NULL, NULL, NULL);
+        
+        $this->result = $this->eds->apiCitationStyles($an, $db, $styles);
+
+        // var_dump($this->result);
+        // die();
+
+        return $this->result;
+        
+    }
+
+    // public function autocomplete(){
+
+    //     $this->result = $this->eds->apiAutoComplete();
+        
+    //     var_dump($this->result);
+    //     die();
+    //     return $this->result;
+
+    // }
+
+    // public function autocomplete() {
+
+    //     list($term, $idx, $filtersAuto, $token) = isset($this->params['id']) ? explode($this->params['id'], 4) : array(NULL, NULL, NULL, NULL);
+
+    //     $this->result = $this->eds->apiAutoComplete($term, $idx, $filtersAuto, $token);
+    //     //$this->result = $this->apiAutoComplete();
+
+    //     var_dump($this->result);
+    //     die();
+
+    //     return $this->result;
+
+    // }
+    public function autocomplete() {
+        $this->result = $this->eds->apiAuthenticationToken($autocompleteUrl);
+
+        // var_dump($this->result);
+        // die();
+        // $test = json_decode($this->result);
+        // echo $test;
 
         return $this->result;
     }
@@ -259,9 +335,13 @@ class EBSCODocument {
                 'lookfor' => $this->params['lookfor'],
                 'index'   => $this->params['type'],
             );
+            // var_dump($search);
+            // die();
         }
+        
         elseif (isset($this->params['group'])) {
             $search = $this->params;
+            
         }
         else {
             return array();
@@ -273,11 +353,13 @@ class EBSCODocument {
         $page = isset($this->params['page']) ? $this->params['page'] + 1 : 1;
         $limit = $this->limit;
         $sort = isset($this->params['sort']) ? $this->params['sort'] : 'relevance';
-        $amount = isset($this->params['amount']) ? $this->params['amount'] : 'brief';     $mode = isset($this->params['mode']) ? $this->params['mode'] : 'all';
+        $amount = isset($this->params['amount']) ? $this->params['amount'] : 'brief';
+        $mode = isset($this->params['mode']) ? $this->params['mode'] : 'all';
 
         // Check if research starters , EMP are active.
         $info = $this->info();
-        if ($info instanceof  EBSCOException) {
+    
+        if ($info instanceof EBSCOException) {
             return array();
         }
         $rs = FALSE;
@@ -300,7 +382,24 @@ class EBSCODocument {
             }
         }
 
-        $this->results = $this->eds->apiSearch($search, $filter, $page, $limit, $sort, $amount, $mode, $rs, $emp, $autosug);
+        $iqv = FALSE;
+        if (isset($info["includeImageQuickView"])) {
+            
+            if ($info["includeImageQuickView"][0]["DefaultOn"] == "y") {
+                $iqv = TRUE;
+            }
+        }
+
+        $stylesItem = '';
+        if (isset($info["styles"])) {
+            
+            if ($info["styles"] == "all") {
+                $stylesItem = TRUE;
+            }
+        }
+
+        $this->results = $this->eds->apiSearch($search, $filter, $page, $limit, $sort, $amount, $mode, $rs, $emp, $autosug, $iqv, $stylesItem);
+
 
         return $this->results;
     }
@@ -313,10 +412,13 @@ class EBSCODocument {
     public function record() {
         if (empty($this->record) && !(empty($this->result))) {
             $this->record = new EBSCORecord($this->result);
+
         }
 
         return $this->record;
     }
+
+    
 
     /**
      * Get the EBSCORecord models array from results array.
@@ -325,6 +427,7 @@ class EBSCODocument {
      */
     public function records() {
         if ($this->record instanceof EBSCOException) {
+            
             return NULL;
         }
         if ($this->results instanceof EBSCOException) {
@@ -337,6 +440,7 @@ class EBSCODocument {
                 $this->records[] = new EBSCORecord($result);
             }
         }
+
         return $this->records;
     }
 
@@ -344,7 +448,6 @@ class EBSCODocument {
      *
      */
     public function relatedContent() {
-
         if ($this->results instanceof EBSCOException) {
             return NULL;
         }
@@ -357,12 +460,26 @@ class EBSCODocument {
      *
      */
     public function autoSuggestTerms() {
-
         $this->autoSuggestTerms = isset($this->results['autoSuggestTerms']) ? $this->results['autoSuggestTerms'] : NULL;
-
         return $this->autoSuggestTerms;
     }
 
+
+
+    
+    
+    public function imageQuickViewTerms() {
+        $this->imageQuickViewTerms = isset($this->results['imageQuickViewTerms']) ? $this->results['imageQuickViewTerms'] : NULL;
+        return $this->imageQuickViewTerms;
+    }
+
+    public function citationStylesTerms() {
+        $this->citationStylesTerms = isset($this->results['citationStylesTerms']) ? $this->results['citationStylesTerms'] : NULL;
+        return $this->citationStylesTerms;
+    }
+
+  
+    
     /**
      * Get the pagination HTML string.
      *
@@ -414,7 +531,7 @@ class EBSCODocument {
         }
         return $pager;
     }
-
+    
     /********************************************************
      *
      * Getters (class methods)
@@ -825,13 +942,11 @@ class EBSCODocument {
                 }
                 $start = $params['page'];
 
-                if (is_array($lastSearch['records'])) {
-                    if (count($lastSearch['records']) > 10) {
-                        $records = array_slice($lastSearch['records'], $index - $index % $this->limit, $this->limit);
-                    }
-                    else {
-                        $records = $lastSearch['records'];
-                    }
+                if (count($lastSearch['records']) > 10) {
+                    $records = array_slice($lastSearch['records'], $index - $index % $this->limit, $this->limit);
+                }
+                else {
+                    $records = $lastSearch['records'];
                 }
 
                 if (!isset($lastSearch['records'][$index + 1])) {
@@ -883,7 +998,7 @@ class EBSCODocument {
         $_SESSION['EBSCO']['last-search']['current'] = $id;
         return $lastSearch;
     }
-
+    
     /**
      * A recursive array_filter.
      *
@@ -925,11 +1040,9 @@ class EBSCODocument {
      * @return int|null|string
      */
     private function getIndexOfRecordInArrayWithId($array, $value) {
-        if (is_array($array)) {
-            foreach($array as $index=>$arrayInf) {
-                if($arrayInf->record_id == $value) {
-                    return $index;
-                }
+        foreach($array as $index=>$arrayInf) {
+            if($arrayInf->record_id == $value) {
+                return $index;
             }
         }
         return null;

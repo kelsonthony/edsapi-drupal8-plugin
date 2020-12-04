@@ -1,5 +1,29 @@
 <?php
-namespace Drupal\ebsco;
+
+/**
+ * @file
+ * The EBSCO EDS API class.
+ *
+ * PHP version 5
+ *
+ *
+ * Copyright [2017] [EBSCO Information Services]
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+require_once 'EBSCOConnector.php';
+require_once 'EBSCOResponse.php';
 
 /**
  * EBSCO API class.
@@ -93,6 +117,9 @@ class EBSCOAPI {
    */
   public function __construct($config) {
     $this->config = $config;
+
+    // var_dump($config);
+    // die();
   }
 
   /**
@@ -221,8 +248,8 @@ class EBSCOAPI {
     }
 
     $headers = array(
-      'x-authenticationToken' => $this->authenticationToken(),
-      'x-sessionToken'        => $this->sessionToken(),
+      'x-authenticationToken: '.$this->authenticationToken(),
+      'x-sessionToken: '.$this->sessionToken(),
     );
 
     $response = call_user_func_array(array($this->connector(), "request{$action}"), array($params, $headers));
@@ -303,7 +330,7 @@ class EBSCOAPI {
   public function apiSessionToken() {
     // Add authentication tokens to headers.
     $headers = array(
-      'x-authenticationToken' => $this->authenticationToken(),
+      'x-authenticationToken: '.$this->authenticationToken(),
     );
 
     $response = $this->connector()->requestSessionToken($headers);
@@ -373,14 +400,18 @@ class EBSCOAPI {
    */
   public function apiSearch($search,
   $filters,
-        $start = 1,
+  $start = 1,
   $limit = 10,
   $sortBy = 'relevance',
   $amount = 'detailed',
   $mode = 'all',
   $rs = FALSE,
   $emp = FALSE,
-  $autosuggest = FALSE) {
+  $autosuggest = FALSE,
+  $includeimagequickview = FALSE,
+  $styles = '',
+  $IllustrationInfo = FALSE
+  ) {
     $query = array();
 
     // Basic search.
@@ -415,7 +446,7 @@ class EBSCOAPI {
         $type = $group['type'];
         if (isset($group['lookfor'])) {
           $term = $group['lookfor'];
-          $op = $group['bool'];
+          $op = isset($group['bool'])?$group['bool']:"AND";
           $tag = $type && isset(self::$search_tags[$type]) ? self::$search_tags[$type] : '';
 
           // Escape some characters from lookfor term.
@@ -469,11 +500,12 @@ class EBSCOAPI {
       }
     }
     if (!empty($limiters)) {
-      foreach ($limiters as $field => $limiter) {
-        // e.g. LA99:English,French,German.
-        $query['limiter'][] = $field . ':' . implode(',', $limiter);
+      $query['limiter']='';
+        foreach ($limiters as $field => $limiter) {
+          // e.g. LA99:English,French,German.
+          $query['limiter'].= $field . ':' . implode(',', $limiter);
+        }
       }
-    }
     if (!empty($expanders)) {
       // e.g. fulltext, thesaurus.
       $query['expander'] = implode(',', $expanders);
@@ -482,7 +514,7 @@ class EBSCOAPI {
       $groupId = 1;
       foreach ($facets as $field => $facet) {
         // e.g. 1,DE:Math,DE:History.
-        $query['facetfilter'][] = $groupId . ',' . implode(',', $facet);
+        $query['facetfilter'] = $groupId . ',' . implode(',', $facet);
         $groupId += 1;
       }
     }
@@ -520,6 +552,16 @@ class EBSCOAPI {
     // 'pagenumber'     => 1,
         // Specifies whether or not to include highlighting in the search results.
       'highlight'      => 'y',
+
+      
+      'includeimagequickview' => $includeimagequickview,
+
+
+      'format' => 'ris',
+
+      'styles'    => $styles,
+
+    
     );
 
     if ($autosuggest == TRUE) {
@@ -539,9 +581,19 @@ class EBSCOAPI {
       }
     }
 
+    if ($includeimagequickview == TRUE) {
+      $params["includeimagequickview"] = "y";
+    }
+
+    if ($styles == 'all') {
+      $params["styles"] = "all";
+    }
+
     $params = array_merge($params, $query);
 
+
     $result = $this->request('Search', $params);
+
     return $result;
   }
 
@@ -561,16 +613,55 @@ class EBSCOAPI {
    */
   public function apiRetrieve($an, $db) {
     // Add the HTTP query params.
+    //$includeimagequickviewDetail = FALSE;
     $params = array(
       'an'        => $an,
       'dbid'      => $db,
       'highlight' => 'y',
+      //'includeimagequickview' => $includeimagequickviewDetail,
+      //'IllustrationInfo' => 'y',
+      'IllustrationInfo' => $IllustrationInfo,
+      'format' => 'ris',
+      'styles'    => $styles,
     );
-
-    $result = $this->request('Retrieve', $params);
+    
+    $result = $this->request('Retrieve', $params);    
+        
     return $result;
+    
   }
 
+  
+
+  public function apiExport($an, $db) {
+
+    $params = array(
+      'an'        => $an,
+      'dbid'      => $db,
+      'format' => 'ris'
+    );
+    
+    $result = $this->request('Export', $params);
+
+    return $result;
+    
+  }
+
+  public function apiCitationStyles($an, $db, $styles) {
+
+    $params = array(
+      'an'        => $an,
+      'dbid'      => $db,
+      'styles'    => $styles
+    );
+    
+    $result = $this->request('CitationStyles', $params);
+    
+    return $result;
+    
+  }
+
+  
   /**
    * Wrapper for info API call.
    *

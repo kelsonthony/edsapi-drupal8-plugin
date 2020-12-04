@@ -159,6 +159,63 @@ class EBSCORecord {
    */
   public $access_level = NULL;
 
+  /**image quick view
+   * ImageQuickViewItems 
+   */
+  /**
+   * * @global string
+   */
+  //public $image_quick_view_type = NULL;
+  public $image_quick_view = array();
+
+  public $image_quick_view_type_2 = array();
+  /**image quick view
+   * ImageQuickViewItems 
+   */
+  /**
+   * * @global string
+   */
+  public $image_quick_url = NULL;
+
+  /* IllustrationInfo 
+   */
+  /**
+   * * @global string
+   */
+    public $illustrationinfo = array();
+  
+  /**
+   * Type to IQV
+   * * @global string
+   */
+    public $type = NULL;
+
+   /**
+   * Cite  to IQV
+   * * @global string
+   */
+  public $cite = NULL;
+
+   /**
+   * Permission to IQV
+   * * @global string
+   */
+  public $permission = NULL;
+
+  
+
+  /**
+   * imgTitle to IQV
+   * * @global string
+   */
+  public $imgtitle = NULL;
+
+    /**
+   *Citations styles
+   * * @global string
+   */
+  public $citationStylesRecord = NULL;
+
   /**
    * Constructor.
    *
@@ -166,6 +223,7 @@ class EBSCORecord {
    *   Raw data from the EBSCO search representing the record.
    */
   public function __construct($data = array()) {
+  
     $this->data = $data;
     $this->record_id = $this->record_id();
     $this->result_id = $this->result_id();
@@ -186,8 +244,21 @@ class EBSCORecord {
     $this->medium_thumb_link = $this->thumb_link('medium');
     $this->source = $this->source();
     $this->access_level = $this->access_level();
+    $this->image_quick_view = $this->image_quick_view();
+    $this->image_quick_view_type_2 = $this->image_quick_view_type_2();
+    $this->image_quick_url = $this->image_quick_url();
+    $this->illustrationinfo = $this->illustrationinfo();
+    $this->type = $this->type();
+    $this->cite = $this->cite();
+    $this->permission = $this->permission();
+    $this->imgtitle = $this->imgtitle();
+    $this->citationStylesRecord = $this->citationStylesRecord();
+    
+    
   }
 
+  
+  
   /********************************************************
    *
    * Getters
@@ -372,17 +443,8 @@ class EBSCORecord {
    * @return string
    */
   public function title() {
-	$s="";
-    if (isset($this->data['Items']['Title'])) {
-		$s=$this->data['Items']['Title']['Data'] ;
-	}
-	else
-	{
-		if (isset($this->data['Items']['TitleAlt'])){
-			$s=$this->data['Items']['TitleAlt']["Data"];
-		}			
-	}
-	return $s;
+    return isset($this->data['Items']['Title']) ?
+            $this->data['Items']['Title']['Data'] : '';
   }
 
   /**
@@ -403,6 +465,64 @@ class EBSCORecord {
   public function record_id() {
     return isset($this->data['id']) ?
             $this->data['id'] : '';
+  }
+
+   /**
+   * Get the image quick view of the record.
+   *
+   * @return string
+   */
+
+  public function image_quick_view() {
+    return isset($this->data['iqv']) ? $this->data['iqv'] : array();
+  }
+
+  public function image_quick_url() {
+    return isset($this->data['iqv']) ? $this->data['iqv'] : array();
+  
+  }
+
+
+  public function image_quick_view_type_2() {
+    return isset($this->data['ImageQuickViewItems']) &&
+    isset($this->data['ImageQuickViewItems']['iqv']) &&
+    isset($this->data['ImageQuickViewItems']['iqv']['DbId']) &&
+    isset($this->data['ImageQuickViewItems']['iqv']['An']) &&
+    isset($this->data['ImageQuickViewItems']['iqv']['Type']) &&
+    isset($this->data['ImageQuickViewItems']['iqv']['Url']) ?
+    $this->data['ImageQuickViewItems']['iqv']['DbId']['An']['Type']['Url'] : '';
+  }
+
+  public function illustrationinfo() {
+    return isset($this->data['IllustrationInfo'][0]) ? $this->data['IllustrationInfo'][0] : array();
+  }
+
+  
+  public function type() {
+    
+    return isset($this->data['Items']['type']) ?
+    $this->data['Items']['type'] : '';
+  }
+
+  public function cite() {
+    return isset($this->data['Items']['Cite']) ?
+    $this->data['Items']['Cite'] : '';
+  }
+
+  public function permission() {    
+    return isset($this->data['Items']['Permission']) ?
+    $this->data['Items']['Permission'] : '';
+  }
+
+
+  public function imgtitle() {
+    return isset($this->data['Items']['imgTitle']) ?
+    $this->data['Items']['imgTitle'] : '';
+  }
+
+  public function citationStylesRecord() {
+    return isset($this->data['Citation']) ? $this->data['Citation'] : array();
+    
   }
 
 }
