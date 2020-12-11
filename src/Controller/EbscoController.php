@@ -417,7 +417,7 @@ class EbscoController extends ControllerBase  {
 	
 	// }
 
-	public function autocomplete() {
+	public function autocomplete_detail() {
 		header('Access-Control-Allow-Origin "*"');
 		header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
 		header('Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, 
@@ -485,9 +485,9 @@ class EbscoController extends ControllerBase  {
 
 			$buildAutocomplete = [];
 
-			$buildAutocomplete['content'] = [
-				'#markup' => '<div id="lookfortest2">' . $this->t('My Test inside of controller autocomplete') . '</div>',
-			];
+			// $buildAutocomplete['content'] = [
+			// 	'#markup' => '<div id="lookfortest2">' . $this->t('My Test inside of controller autocomplete') . '</div>',
+			// ];
 
 			$buildAutocomplete['#attached']['library'][] = 'ebsco/autocomplete';
 			// $buildAutocomplete['#attached']['drupalSettings']['autocomplete']['title'] = $this->config('system.site')->get('name');
@@ -630,7 +630,7 @@ class EbscoController extends ControllerBase  {
 	
 	// }
 
-	public function autocomplete_detail() {
+	public function autocomplete() {
 		$is_xhr = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
 		
 		// var_dump($is_xhr);

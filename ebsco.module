@@ -153,12 +153,16 @@ function ebsco_basic_search_form() {
     $form['basic']['lookfor'] = array(
         '#id'            => 'lookfor',
         '#name'            => 'lookfor',
+        '#class' => 'autocomplete',
         '#value' => $default_value,
         '#required'    => true,
         '#type'          => 'textfield',
         '#size'          => 40,
         '#attributes'    => array(
-            'title' => t('Enter the terms you wish to search for.')
+            'title' => t('Enter the terms you wish to search for.'),
+            'placeholder' => t('Search anything here.'),
+            'autocomplete' => 'off',
+            'class' => 'autocomplete'
         ),
     );
 
@@ -176,6 +180,18 @@ function ebsco_basic_search_form() {
         '#type'  => 'submit',
         '#value' => t('Search')
     );
+
+    $form['basic']['autocomplete'] = array(
+        '#id'    => 'autocomplete',
+        '#type'  => 'ul',
+        '#attributes'    => array(
+            'data-js'    => 'autocomplete'
+            
+        ),
+    );
+    $formautocomplete = '<div id="autocomplete" class="autocomplete" data-js="autocomplete"><ul></ul></div>';
+
+   
 
     if (isset($params['filter'])) {
         foreach($params['filter'] as $key => $value) {
@@ -195,7 +211,7 @@ function ebsco_basic_search_form() {
             '#default_value' => true
         );
     }
-    
+    echo $formautocomplete;
     
     return $form;
 }

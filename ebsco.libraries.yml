@@ -10,7 +10,7 @@ global-scripts:
       js/dom.js: {}
 autocomplete:
     js:
-      js/autocomplete11.js: {}
+      js/autocomplete16.js: {}
     dependencies:
       - core/jquery
       - core/jquery.once
