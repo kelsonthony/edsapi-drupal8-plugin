@@ -22,11 +22,11 @@
                         var autocompleteCustId = drupalSettings.autocomplete.autocompleteCustId;
                         var searchvalue = event.target.value;
 
-                        console.log(".authenticationToken: ", drupalSettings.autocomplete.authenticationToken);
-                        console.log(".authenticationTimeout: ", drupalSettings.autocomplete.authenticationTimeout);
-                        console.log(".autocompleteUrl: ", drupalSettings.autocomplete.autocompleteUrl);
-                        console.log(".autocompleteToken: ", drupalSettings.autocomplete.autocompleteToken);
-                        console.log(".autocompleteCustId: ", drupalSettings.autocomplete.autocompleteCustId);
+                        // console.log(".authenticationToken: ", drupalSettings.autocomplete.authenticationToken);
+                        // console.log(".authenticationTimeout: ", drupalSettings.autocomplete.authenticationTimeout);
+                        // console.log(".autocompleteUrl: ", drupalSettings.autocomplete.autocompleteUrl);
+                        // console.log(".autocompleteToken: ", drupalSettings.autocomplete.autocompleteToken);
+                        // console.log(".autocompleteCustId: ", drupalSettings.autocomplete.autocompleteCustId);
         
 
                         $.ajax({
@@ -196,10 +196,16 @@
     
             /*An array containing all the country names in the world:*/
             var countries = ["java", "jacare", "jurere"];
+            var result = startTerm();
+
+            // console.log(result);
+
+
     
             /*initiate the autocomplete function on the "myInput" element, and pass along the countries array as possible autocomplete values:*/
-            callAutocomplete();
+            requestAutocomplete();
             autocompleteStart(document.getElementById("lookfor"), countries);
+            //autocompleteStart(document.getElementById("lookfor"), result);
         },
     };
 })(jQuery, Drupal, drupalSettings, document);

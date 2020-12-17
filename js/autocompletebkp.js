@@ -7,7 +7,6 @@
 
         var $lookfor = doc.getElementById("lookfor");
         var currentFocus;
-        var autocompleteList = doc.getElementById("lookforautocomplete-list");
 
         context.addEventListener("keydown", keyBoard, false);
 
@@ -40,73 +39,25 @@
             });
 
             
-            
-           
-            
-           
-        }
-
-        function closeAllLists(elmnt, inp) {
-            var autocompleteList = doc.getElementsByClassName(
-                "autocomplete-items"
-            );
-            for (var i = 0; i < autocompleteList.length; i++) {
-                if (elmnt != autocompleteList[i] && elmnt != inp) {
-                    autocompleteList[i].parentNode.removeChild(autocompleteList[i]);
-                }
-            }
-        }
-
-        function autocomplete(inp, arr) {
-            
-            inp.addEventListener("input", function(e) {
-                var divCreate,
-                b,
-                i,
-                fieldVal = this.value;
-                closeAllLists();
-                if (!fieldVal) {
-                    return false;
-                }
-                currentFocus = -1;
-                divCreate = doc.createElement("ul");
-                divCreate.setAttribute("id", this.id + "autocomplete-list");
-                divCreate.setAttribute("class", "autocomplete-items");
-                this.parentNode.appendChild(divCreate);
-                for (i = 0; i <arr.length; i++) {
-                    if ( arr[i].substr(0, fieldVal.length).toUpperCase() == fieldVal.toUpperCase() ) {
-                        b = doc.createElement("li");
-                        b.innerHTML = "<strong>" + arr[i].substr(0, fieldVal.length) + "</strong>";
-                        b.innerHTML += arr[i].substr(fieldVal.length);
-                        b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
-                        b.addEventListener("click", function(e) {
-                        inp.value = this.getElementsByTagName("input")[0].value;
-                        closeAllLists();
-                        });
-                        divCreate.appendChild(b);
-                    }
-                }
-            });
-
-            if (autocompleteList) {
+            var autocompleteList = doc.getElementById("lookforautocomplete-list");
+            if (autocompleteList)
                 autocompleteList = autocompleteList.getElementsByTagName("li");
-            }
-            if (inp.keyCode == 40) {
+            if (e.keyCode == 40) {
                 currentFocus++;
                 addActive(autocompleteList);
             }
-            else if (inp.keyCode == 38) {
+            else if (e.keyCode == 38) {
                 //up
                 currentFocus--;
                 addActive(autocompleteList);
             }
-            else if (inp.keyCode == 13) {
-                inp.preventDefault();
+            else if (e.keyCode == 13) {
+                e.preventDefault();
                 if (currentFocus > -1) {
                     if (autocompleteList) autocompleteList[currentFocus].click();
                 }
             }
-
+            
             function addActive(autocompleteList) {
                 if (!autocompleteList) return false;
                     removeActive(autocompleteList);
@@ -120,10 +71,20 @@
                 }
             }
             doc.addEventListener("click", function(e) {
-                closeAllLists(inp.target);
+                closeAllLists(e.target);
                 //console.log('meu clique: ', e.target);
             });
+        }
 
+        function closeAllLists(elmnt, inp) {
+            var autocompleteList = doc.getElementsByClassName(
+                "autocomplete-items"
+            );
+            for (var i = 0; i < autocompleteList.length; i++) {
+                if (elmnt != autocompleteList[i] && elmnt != inp) {
+                    autocompleteList[i].parentNode.removeChild(autocompleteList[i]);
+                }
+            }
         }
 
         function startAutocomplete(data) {
@@ -137,9 +98,41 @@
             
             console.log(terms);
             
-          
+            /**External autocomplete starts here */
+            function autocomplete(inp, arr) {
+                var currentFocus;
+                inp.addEventListener("input", function(e) {
+                    var divCreate,
+                    b,
+                    i,
+                    fieldVal = this.value;
+                    closeAllLists();
+                    if (!fieldVal) {
+                        return false;
+                    }
+                    currentFocus = -1;
+                    divCreate = doc.createElement("ul");
+                    divCreate.setAttribute("id", this.id + "autocomplete-list");
+                    divCreate.setAttribute("class", "autocomplete-items");
+                    this.parentNode.appendChild(divCreate);
+                    for (i = 0; i <arr.length; i++) {
+                        if ( arr[i].substr(0, fieldVal.length).toUpperCase() == fieldVal.toUpperCase() ) {
+                            b = doc.createElement("li");
+                            b.innerHTML = "<strong>" + arr[i].substr(0, fieldVal.length) + "</strong>";
+                            b.innerHTML += arr[i].substr(fieldVal.length);
+                            b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+                            b.addEventListener("click", function(e) {
+                            inp.value = this.getElementsByTagName("input")[0].value;
+                            closeAllLists();
+                            });
+                            divCreate.appendChild(b);
+                        }
+                    }
+                });
+
+            }
                 console.log('inside of the function: ', terms);
-                //var animals = ["giraffe","tiger", "lion", "dog","cow","bull","cat","cheetah"];
+                var animals = ["giraffe","tiger", "lion", "dog","cow","bull","cat","cheetah"];
                 autocomplete($lookfor, terms);
             /**External autocomplete ends here */
             

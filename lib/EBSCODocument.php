@@ -28,7 +28,7 @@
 
 require_once __DIR__ . '/EBSCOAPI.php';
 require_once __DIR__ . '/EBSCORecord.php';
-require_once __DIR__ . '/EBSCOAutocomplete.php';
+
 
 /**
  *
