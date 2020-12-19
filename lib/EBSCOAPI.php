@@ -24,7 +24,6 @@
 
 require_once 'EBSCOConnector.php';
 require_once 'EBSCOResponse.php';
-//require_once 'EBSCOAutocomplete.php';
 
 /**
  * EBSCO API class.
@@ -119,9 +118,6 @@ class EBSCOAPI {
   public function __construct($config) {
     $this->config = $config;
 
-    
-    // var_dump($config);
-    // die();
   }
 
   /**
@@ -133,37 +129,13 @@ class EBSCOAPI {
    *
    * @access public
    */
-  // public function authenticationToken($token = NULL) {
-  //   if (empty($token)) {
-  //     $token = $this->readSession('authenticationToken');
-
-  //     // var_dump($token);
-  //     // die();
-  //     return !empty($token) ? $token : $this->authenticationToken;
-  //   }
-  //   else {
-  //     $this->authenticationToken = $token;
-  //     $this->writeSession('authenticationToken', $token);
-  //   }
-  // }
+  
 
   public function authenticationToken(){
-
-    // $buildTest = [];
-
-    // $buildTest['content'] = [
-		// 	'#markup' => '<div id="buildtest">' . $this->t('My Build Test from EBSCO AOI') . '</div>',
-		// ];
-
-    // $buildTest['#attached']['library'][] = 'ebsco/autocomplete';
-
-    // var_dump($buildTest);
-    // die();
 
     $autocompleteTokenTimeOut=time();
 		$authenticationTimeout=0;
 		if (isset($_SESSION["authenticationToken"])){
-           // $this->token = $_SESSION["authenticationToken"];
             $token = $_SESSION["authenticationToken"];
             $authenticationTimeout = $_SESSION["authenticationTimeout"]-600;
             $timeout = $_SESSION["authenticationTimeout"];
@@ -202,8 +174,6 @@ class EBSCOAPI {
       'autocompleteCustId' => $autocompleteCustId
     );
 
-      // var_dump($result);
-      // die();
       return $result['authenticationToken'];
 		}else{
             return $this->token;
@@ -370,40 +340,11 @@ class EBSCOAPI {
    *
    * @access public
    */
-  //starts here
-  // public function apiAuthenticationToken() {
-  //   $response = $this->connector()->requestAuthenticationToken();
 
-  //   // var_dump($response);
-  //   // die();
-
-  //   if ($this->isError($response)) {
-  //     return $response;
-  //   }
-  //   else {
-  //     $result = $this->response($response)->result();
-       
-  //     if (isset($result['authenticationToken'])) {
-        
-  //       $this->authenticationToken($result['authenticationToken']);
-
-  //       var_dump($result);
-  //       die();
-  //       return $result['authenticationToken'];
-  //     }
-  //     else {
-  //       return new EBSCOException("No authentication token was found in the response.");
-  //     }
-  //   }
-  // }
-
-  public function apiAuthenticationToken()
-  {
+  public function apiAuthenticationToken() {
       $response = $this->connector()->requestAuthenticationToken();
       $result = $this->response($response)->result();
 
-      // var_dump($result);
-      // die();
       return $result;
   }
 
@@ -686,9 +627,6 @@ class EBSCOAPI {
 
     $result = $this->request('Search', $params);
 
-    // var_dump($result);
-    // die();
-
     return $result;
   }
 
@@ -775,63 +713,20 @@ class EBSCOAPI {
     if (!$this->isError($result)) {
       $this->writeSession('info', $result);
     }
-    // var_dump($result);
-    // die();
     return $result;
   }
 
-  /**
-   * autocomplete
-   */
   public function apiAutoComplete(){
-    if(self::$autocomplete == 'y'){
-      var_dump($autocomplete);
-      die();
-      return true;
-    }
-    else{
-      return false;
-    }
+      if(self::$autocomplete == 'y'){
+        var_dump($autocomplete);
+        die();
+        return true;
+      }
+      else{
+        return false;
+      }
   }
-  // public function apiAutoComplete( $term = "te", $idx = "rawqueries", 
-  //   $filtersAuto = '
-  //     [{"name":"custid",
-  //       "values":"kelanthony"
-  //     }]', 
-  //     $token = "hello" ) {
-
-  //   $params = array(
-  //     'term' => $term,
-  //     'idx' => $idx,
-  //     'filters' => $filtersAuto,
-  //     'token' => $token
-  //   );
-
-  //   $result = $this->request('autoComplete', $params);
-
-  //   // var_dump($params);
-  //   // die();
-
-  //   return $result;
-
-  // }
-  // public function apiAutoComplete($term, $idx, $filtersAuto, $token) {
-
-  //   $params = array(
-  //     'term' => $term,
-  //     'idx' => $idx,
-  //     'filters' => $filtersAuto,
-  //     'token' => $token
-  //   );
-
-  //   $result = $this->request('autoComplete', $params);
-
-  //   var_dump($result);
-  //   die();
-
-  //   return $result;
-
-  // }
+  
 
   /**
    * Handle a PEAR_Error. Return :

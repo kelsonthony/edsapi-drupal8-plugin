@@ -118,8 +118,6 @@ class EBSCOAPI {
   public function __construct($config) {
     $this->config = $config;
 
-    // var_dump($config);
-    // die();
   }
 
   /**

@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@CHARSET "UTF-8";
+
 
 /** General ***/
 @import url(https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css);
@@ -561,10 +561,6 @@ label {
     display: inline ! important;
 }
 
-.resultslist-2columns{
-	
-}
-
 .resultslist-2columns:after {
     content: "";
     display: table;
@@ -606,10 +602,6 @@ label {
 		width: 100%;	
 		
 	}
-}
-
-.detailrecord-2columns{
-	
 }
 
 .detailrecord-2columns:after {
@@ -661,7 +653,6 @@ label {
   margin-left: -13%;
 }
 
-
 .tooltip {
   position: relative;
   display: inline-block;
@@ -708,100 +699,4 @@ label {
   color: #018fe2;
 }
 
-/*
-autocoomplete starts here
-*/
 
-/* .autocomplete {
-  width: 30.3%;
-  position: absolute;
-  margin-top: 5.5%;
-  z-index: 999;
-  border: 1px solid #000;
-  border-top: navajowhite;
-  background: #fff;
-} */
-
-/* .autocomplete-list {
-  list-style: none;
-  margin-left: 1%;
-}
-
-.autocomplete-list:hover {
-  list-style: none;
-  margin-left: 1%;
-  background-color: #018fe2;
-  color: #fff;
-} */
-/*
-autocoomplete ends here
-*/
-
-/*autocomplete externo*/
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  font: 16px Arial;
-}
-
-/*the container must be positioned relative:*/
-.autocomplete {
-  position: relative;
-  display: inline-block;
-}
-
-input {
-  /* border: 1px solid transparent; */
-  /* background-color: #f1f1f1; */
-  padding: 10px;
-  font-size: 16px;
-}
-
-input[type=text] {
-  /* background-color: #f1f1f1; */
-  width: 40%;
-}
-
-input[type=submit] {
-  background-color: DodgerBlue;
-  /* color: #fff; */
-  cursor: pointer;
-}
-
-.autocomplete-items {
-  position: absolute;
-  border: 1px solid #aaa;
-  border-top: none;
-  z-index: 99;
-  top: 100%;
-  left: 0;
-  right: 0;
-  list-style: none;
-  margin-top: -3%;
-  margin-left: 0%;
-  padding: 0;
-  width: 40%;
-}
-
-.autocomplete-items li {
-  padding: 10px;
-  cursor: pointer;
-  background-color: #fff;
-  border-bottom: 1px solid #d4d4d4;
-}
-
-/*when hovering an item:*/
-.autocomplete-items li:hover {
-  background-color: #e9e9e9;
-}
-
-/*when navigating through the items using the arrow keys:*/
-.autocomplete-active {
-  list-style: none;
-  background-color: DodgerBlue !important;
-  color: #ffffff;
-}
-/*autocomplete externo*/

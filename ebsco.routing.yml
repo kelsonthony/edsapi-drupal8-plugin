@@ -10,7 +10,7 @@ ebsco.content:
   path: '/ebsco'
   defaults:
     _title: 'EDS search page'
-    _controller: '\Drupal\ebsco\Controller\EbscoController::autocomplete_detail'
+    _controller: '\Drupal\ebsco\Controller\EbscoController::autocomplete'
   requirements:
     _permission: 'access content'
 
@@ -27,6 +27,7 @@ ebsco.results:
   defaults:
     _title: 'EDS results list'
     _controller: '\Drupal\ebsco\Controller\EbscoController::results'
+    #_controller: '\Drupal\ebsco\Controller\EbscoController::autocomplete'
   requirements:
     _permission: 'access content'
 
@@ -103,35 +104,7 @@ ebsco.citation_styles:
 ebsco.autocomplete:
   path: '/ebsco/autocomplete'
   defaults:
-    _title: 'Autocomplete Route'
+    _title: 'Autocomplete Detail 2'
     _controller: '\Drupal\ebsco\Controller\EbscoController::autocomplete'
   requirements:
     _permission: 'access content'
-# ebsco.autocomplete:
-#   path: '/ebsco/autocomplete'
-#   defaults:
-#     _title: 'Autocomplete Route'
-#     _controller: '\Drupal\ebsco\Controller\EbscoController::autocomplete'
-#   requirements:
-#     _permission: 'access content'
-#     _method: 'GET'
-#   options:
-#     _is_jsonapi: 1
-
-ebsco.autocomplete_detail:
-  path: '/ebsco/autocomplete_detail'
-  defaults:
-    _title: 'Autocomplete Detail 2'
-    _controller: '\Drupal\ebsco\Controller\EbscoController::autocomplete_detail'
-  requirements:
-    _permission: 'access content'
-
-
-    
-# ebsco.autocomplete_detail:
-#   path: '/'
-#   defaults:
-#     _title: 'This is a Root Page'
-#     _controller: '\Drupal\ebsco\Controller\EbscoController::autocomplete_detail'
-#   requirements:
-#     _permission: 'access content'

@@ -216,13 +216,7 @@ class EBSCOConnector {
     $this->local_ip_address = $config['local_ip_address'];
     $this->isGuest = (\Drupal::currentUser()->isAuthenticated() || $this->isGuestIPAddress($_SERVER["REMOTE_ADDR"])) ? 'n' : 'y';
     $this->logAPIRequests = ($config['log'] == 1);
-    // if ($this->logAPIRequests) {
-      // $writer = new Zend_Log_Writer_Stream('php://output');
-      
-    // }
-
-    // var_dump($config);
-    // die();
+    
   }
 
   /**
@@ -285,9 +279,6 @@ class EBSCOConnector {
 
     $response = $this->request($url,$params, array(), 'POST');
 
-    // var_dump($response);
-    // die();
-
     return $response;
   }
 
@@ -308,14 +299,11 @@ class EBSCOConnector {
     $params = array(
       'profile' => $this->profileId,
       'org'     => $this->orgId,
-      'guest'   => $this->isGuest,
-      //'autocomplete' => $this->autoComplete
+      'guest'   => $this->isGuest
     );
 
     $response = $this->request($url, $params, $headers);
 
-    // var_dump($response);
-    // die();
     return $response;
   }
 
@@ -355,9 +343,6 @@ class EBSCOConnector {
 
     $response = $this->request($url, $params, $headers);
 
-    // var_dump($response);
-    // die();
-    
     return $response;
   }
 
@@ -404,23 +389,6 @@ class EBSCOConnector {
     
   }
 
-
-
-  // public function requestAutoComplete($params, $headers) {
-  //   $url = self::$end_point . '/autoComplete';
-  //   $params = array(
-  //     'autocomplete' => $this->autoComplete
-  //   );
-
-  //   $response = $this->request($url, $params, $headers);
-
-  //   // var_dump($url);
-  //   // die();
-
-  //   return $response;
-  // }
-
-  
 
   /**
    * Request the info data.
@@ -505,7 +473,7 @@ class EBSCOConnector {
 				}
 				break;
         }
-		//curl_setopt($curl, CURLINFO_HEADER_OUT, true);
+		
 		
         $response = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);

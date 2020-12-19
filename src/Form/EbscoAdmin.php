@@ -41,8 +41,6 @@ class EbscoAdmin extends ConfigFormBase {
     $config->set("ebsco_local_ips", $values["ebsco_local_ips"]);
     $config->save(); 
 
-    // var_dump($config);
-    // die();
 	
   }
 

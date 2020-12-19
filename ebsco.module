@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Url;
+use Drupal\Core\Asset\AttachedAssetsInterface;
 
 
 require_once __DIR__ . '/lib/EBSCODocument.php';
@@ -132,7 +133,6 @@ function  ebsco_theme($existing, $type, $theme, $path) {
 /******************************************************
  * Form builders, form handlers and templates handlers
  ******************************************************/
-
 
 
 /**

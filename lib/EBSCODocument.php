@@ -90,8 +90,6 @@ class EBSCODocument {
 
     private $imageQuickViewTerms = array();
 
-  
-
     /**
      * The array of filters currently applied.
      *
@@ -288,37 +286,8 @@ class EBSCODocument {
         
     }
 
-    // public function autocomplete(){
-
-    //     $this->result = $this->eds->apiAutoComplete();
-        
-    //     var_dump($this->result);
-    //     die();
-    //     return $this->result;
-
-    // }
-
-    // public function autocomplete() {
-
-    //     list($term, $idx, $filtersAuto, $token) = isset($this->params['id']) ? explode($this->params['id'], 4) : array(NULL, NULL, NULL, NULL);
-
-    //     $this->result = $this->eds->apiAutoComplete($term, $idx, $filtersAuto, $token);
-    //     //$this->result = $this->apiAutoComplete();
-
-    //     var_dump($this->result);
-    //     die();
-
-    //     return $this->result;
-
-    // }
     public function autocomplete() {
         $this->result = $this->eds->apiAuthenticationToken($autocompleteUrl);
-
-        // var_dump($this->result);
-        // die();
-        // $test = json_decode($this->result);
-        // echo $test;
-
         return $this->result;
     }
 
@@ -335,17 +304,15 @@ class EBSCODocument {
                 'lookfor' => $this->params['lookfor'],
                 'index'   => $this->params['type'],
             );
-            // var_dump($search);
-            // die();
+            
         }
         
         elseif (isset($this->params['group'])) {
             $search = $this->params;
             
-        }
-        else {
+        }else {
             return array();
-        }
+            }
 
 
 

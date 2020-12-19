@@ -255,6 +255,8 @@ http://kelsonthony/drupal/drupal-8.8.5/ebsco/%7B%22authenticationToken%22:%22AEZ
 
 http://kelsonthony/drupal/drupal-8.8.5/ebsco/autocomplete
 
+# checar a versão do jquery jQuery.fn.jquery
+
 
 # Drupal 9
 
